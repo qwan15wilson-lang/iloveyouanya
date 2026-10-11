@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Game 🎮</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a162b;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        h1 { color: #ff4d6d; margin-bottom: 20px; }
+
+        .character-box {
+            width: 220px;
+            height: 220px;
+            background: #2a2438;
+            border: 3px solid #ff4d6d;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            box-shadow: 0 10px 25px rgba(255, 77, 109, 0.3);
+            transition: transform 0.1s ease-in-out;
+            user-select: none;
+            margin-bottom: 30px;
+        }
+
+        .shake { animation: shakeAnim 0.3s ease-in-out; }
+        .bounce { animation: bounceAnim 0.5s ease-in-out; }
+
+        @keyframes shakeAnim {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-15px) rotate(-5deg); }
+            50% { transform: translateX(15px) rotate(5deg); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes bounceAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .btn-container { display: flex; gap: 15px; }
+
+        button {
+            padding: 14px 25px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+
+        button:active { transform: scale(0.9); }
+        .hit-btn { background: linear-gradient(45deg, #ff416c, #ff4b2b); }
+        .love-btn { background: linear-gradient(45deg, #ff758c, #ff7eb3); }
+    </style>
+</head>
+<body>
+
+    <h1>Interactive Mini Game 🎮</h1>
+
+    <div class="character-box" id="character">🥺</div>
+
+    <div class="btn-container">
+        <button class="hit-btn" onclick="hitCharacter()">Hit 🥊</button>
+        <button class="love-btn" onclick="loveCharacter()">Pyaar Karo 💖</button>
+    </div>
+
+    <audio id="sound-aah" src="aah.mp3"></audio>
+    <audio id="sound-love" src="iloveyou.mp3"></audio>
+
+    <script>
+        const char = document.getElementById('character');
+        const audioAah = document.getElementById('sound-aah');
+        const audioLove = document.getElementById('sound-love');
+
+        function hitCharacter() {
+            audioAah.currentTime = 0;
+            audioAah.play().catch(() => {});
+
+            char.innerText = '😖';
+            char.classList.add('shake');
+
+            setTimeout(() => {
+                char.classList.remove('shake');
+                char.innerText = '🥺';
+            }, 600);
+        }
+
+        function loveCharacter() {
+            audioLove.currentTime = 0;
+            audioLove.play().catch(() => {});
+
+            char.innerText = '🥰';
+            char.classList.add('bounce');
+
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: { y: 0.6 }
+            });
+
+            setTimeout(() => {
+                char.classList.remove('bounce');
+                char.innerText = '🥺';
+            }, 800);
+        }
+    </script>
+</body>
+</html>
