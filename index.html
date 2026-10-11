@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Game 🎮</title>
+    <title>Anya Mini Game 🎮💖</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #1a162b;
+            background-color: #0f0c20;
             color: #fff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
@@ -20,45 +20,84 @@
             text-align: center;
         }
 
-        h1 { color: #ff4d6d; margin-bottom: 20px; }
+        h1 { color: #ff4d6d; margin-bottom: 5px; font-size: 1.8rem; }
+        .sub-title { opacity: 0.8; margin-bottom: 20px; font-size: 0.95rem; }
+
+        .character-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
 
         .character-box {
-            width: 220px;
-            height: 220px;
-            background: #2a2438;
+            width: 230px;
+            height: 230px;
+            background: #1a162b;
             border: 3px solid #ff4d6d;
             border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(255, 77, 109, 0.4);
+            transition: transform 0.2s ease, filter 0.2s ease;
+            user-select: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 80px;
-            box-shadow: 0 10px 25px rgba(255, 77, 109, 0.3);
-            transition: transform 0.1s ease-in-out;
-            user-select: none;
-            margin-bottom: 30px;
         }
 
-        .shake { animation: shakeAnim 0.3s ease-in-out; }
-        .bounce { animation: bounceAnim 0.5s ease-in-out; }
+        .character-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Overlay Reactions */
+        .reaction-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2.2rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        /* Hit FX */
+        .hit-fx {
+            filter: sepia(1) hue-rotate(300deg) saturate(4) contrast(1.2);
+            animation: shakeAnim 0.3s ease-in-out;
+        }
+
+        /* Love FX */
+        .love-fx {
+            filter: drop-shadow(0 0 15px #ff4d6d);
+            animation: bounceAnim 0.4s ease-in-out;
+        }
 
         @keyframes shakeAnim {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-15px) rotate(-5deg); }
-            50% { transform: translateX(15px) rotate(5deg); }
-            75% { transform: translateX(-10px); }
-            100% { transform: translateX(0); }
+            0% { transform: translateX(0) rotate(0); }
+            20% { transform: translateX(-12px) rotate(-6deg); }
+            40% { transform: translateX(12px) rotate(6deg); }
+            60% { transform: translateX(-8px) rotate(-3deg); }
+            80% { transform: translateX(8px) rotate(3deg); }
+            100% { transform: translateX(0) rotate(0); }
         }
 
         @keyframes bounceAnim {
             0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
+            50% { transform: scale(1.12); }
             100% { transform: scale(1); }
+        }
+
+        .counter-box {
+            margin-bottom: 20px;
+            font-size: 1rem;
+            color: #c77dff;
+            font-weight: bold;
         }
 
         .btn-container { display: flex; gap: 15px; }
 
         button {
-            padding: 14px 25px;
+            padding: 14px 24px;
             border: none;
             border-radius: 30px;
             font-size: 1rem;
@@ -69,60 +108,125 @@
             transition: transform 0.1s;
         }
 
-        button:active { transform: scale(0.9); }
+        button:active { transform: scale(0.92); }
         .hit-btn { background: linear-gradient(45deg, #ff416c, #ff4b2b); }
         .love-btn { background: linear-gradient(45deg, #ff758c, #ff7eb3); }
+
+        /* Secret Modal Popup */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: #1a162b;
+            border: 2px solid #ff4d6d;
+            padding: 25px;
+            border-radius: 20px;
+            max-width: 320px;
+            text-align: center;
+            animation: bounceAnim 0.5s ease-in-out;
+        }
+
+        .modal-content h2 { color: #ff4d6d; margin-top: 0; }
+        .modal-content p { color: #f8f9fa; line-height: 1.5; font-size: 0.95rem; }
     </style>
 </head>
 <body>
 
-    <h1>Interactive Mini Game 🎮</h1>
+    <h1>Interactive Kitty Game 🎮</h1>
+    <div class="sub-title">Anya ko thoda gussa karo ya bohot sara pyaar! ❤️</div>
 
-    <div class="character-box" id="character">🥺</div>
+    <!-- Character Container -->
+    <div class="character-container">
+        <div class="character-box" id="char-box">
+            <img src="normal.jpg" alt="Cute Anya Kitty">
+        </div>
+        <div class="reaction-overlay" id="overlay"></div>
+    </div>
 
+    <!-- Love Counter -->
+    <div class="counter-box">
+        Love meter: <span id="love-count">0</span> / 5 💖
+    </div>
+
+    <!-- Controls -->
     <div class="btn-container">
-        <button class="hit-btn" onclick="hitCharacter()">Hit 🥊</button>
+        <button class="hit-btn" onclick="hitCharacter()">Maro 🥊</button>
         <button class="love-btn" onclick="loveCharacter()">Pyaar Karo 💖</button>
     </div>
 
-    <audio id="sound-aah" src="aah.mp3"></audio>
-    <audio id="sound-love" src="iloveyou.mp3"></audio>
+    <!-- Popup Modal -->
+    <div class="modal" id="secret-modal">
+        <div class="modal-content">
+            <h2>You Unlocked My Heart! 💖✨</h2>
+            <p>Jitna bhi tang kar lo ya pyaar kar lo, I'm always yours Anya baby! I love you sooooo much! 🥰🥺🎀</p>
+            <button class="love-btn" onclick="closeModal()">Awww 🥰</button>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="sound-aah" src="aah.mp3" preload="auto"></audio>
+    <audio id="sound-love" src="iloveyou.mp3" preload="auto"></audio>
 
     <script>
-        const char = document.getElementById('character');
+        const charBox = document.getElementById('char-box');
+        const overlay = document.getElementById('overlay');
         const audioAah = document.getElementById('sound-aah');
         const audioLove = document.getElementById('sound-love');
+        let loveCount = 0;
 
         function hitCharacter() {
             audioAah.currentTime = 0;
             audioAah.play().catch(() => {});
 
-            char.innerText = '😖';
-            char.classList.add('shake');
+            charBox.className = "character-box hit-fx";
+            overlay.innerText = "💥😖";
+            overlay.style.opacity = "1";
 
             setTimeout(() => {
-                char.classList.remove('shake');
-                char.innerText = '🥺';
-            }, 600);
+                charBox.className = "character-box";
+                overlay.style.opacity = "0";
+            }, 500);
         }
 
         function loveCharacter() {
             audioLove.currentTime = 0;
             audioLove.play().catch(() => {});
 
-            char.innerText = '🥰';
-            char.classList.add('bounce');
+            charBox.className = "character-box love-fx";
+            overlay.innerText = "🥰💖";
+            overlay.style.opacity = "1";
+
+            loveCount++;
+            document.getElementById('love-count').innerText = loveCount;
 
             confetti({
-                particleCount: 50,
-                spread: 60,
+                particleCount: 40,
+                spread: 50,
                 origin: { y: 0.6 }
             });
 
+            if (loveCount === 5) {
+                setTimeout(() => {
+                    document.getElementById('secret-modal').style.display = 'flex';
+                    confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
+                }, 500);
+            }
+
             setTimeout(() => {
-                char.classList.remove('bounce');
-                char.innerText = '🥺';
-            }, 800);
+                charBox.className = "character-box";
+                overlay.style.opacity = "0";
+            }, 600);
+        }
+
+        function closeModal() {
+            document.getElementById('secret-modal').style.display = 'none';
         }
     </script>
 </body>
